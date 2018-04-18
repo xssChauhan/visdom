@@ -231,7 +231,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             'Opened new socket from ip: {}'.format(self.request.remote_ip))
 
         self.write_message(
-                json.dumps({'command': 'register', 'data': self.sid , 'readonly' : READONLY}))
+                json.dumps({'command': 'register', 'data': self.sid , 'readonly': READONLY}))
         self.broadcast_layouts([self])
         broadcast_envs(self, [self])
 

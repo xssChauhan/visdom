@@ -63,6 +63,7 @@ const DEFAULT_LAYOUT = 'current';
 class App extends React.Component {
   state = {
     connected: false,
+    readonly:false,
     sessionID: null,
     panes: {},
     focusedPaneID: null,
@@ -220,6 +221,7 @@ class App extends React.Component {
       case 'register':
         this.setState({
           sessionID: cmd.data,
+          readonly: cmd.readonly,
         }, () => {this.postForEnv(this.state.envIDs);});
         break;
       case 'pane':
@@ -1068,7 +1070,7 @@ class App extends React.Component {
                 'btn-success': this.state.connected,
                 'btn-danger': !this.state.connected})}
               onClick={this.toggleOnlineState}>
-              {this.state.connected ? 'online' : 'offline'}
+              'Shikhar'
             </button>
           </span>
         </div>

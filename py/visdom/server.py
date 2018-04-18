@@ -36,7 +36,8 @@ import tornado.escape     # noqa E402: gotta install ioloop first
 LAYOUT_FILE = 'layouts.json'
 DEFAULT_ENV_PATH = '%s/.visdom/' % expanduser("~")
 DEFAULT_PORT = 8097
-
+READONLY = False
+READONLY_CMDS = ["close","delete_env","save_layouts"]
 
 def get_rand_id():
     return str(hex(int(time.time() * 10000000))[2:])
@@ -230,7 +231,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             'Opened new socket from ip: {}'.format(self.request.remote_ip))
 
         self.write_message(
-            json.dumps({'command': 'register', 'data': self.sid}))
+                json.dumps({'command': 'register', 'data': self.sid , 'readonly' : READONLY}))
         self.broadcast_layouts([self])
         broadcast_envs(self, [self])
 
@@ -239,6 +240,9 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         msg = tornado.escape.json_decode(tornado.escape.to_basestring(message))
 
         cmd = msg.get('cmd')
+        if READONLY and cmd in READONLY_CMDS:
+            return
+
         if cmd == 'close':
             if 'data' in msg and 'eid' in msg:
                 logging.info('closing window {}'.format(msg['data']))
@@ -1026,8 +1030,11 @@ def download_scripts(proxies=None, install_dir=None):
                     exc.reason, key))
 
 
-def start_server(port=DEFAULT_PORT, env_path=DEFAULT_ENV_PATH, print_func=None):
+def start_server(port=DEFAULT_PORT, env_path=DEFAULT_ENV_PATH, readonly=False, print_func=None):
+    global READONLY
     print("It's Alive!")
+    if readonly:
+        READONLY = True
     app = Application(port=port, env_path=env_path)
     app.listen(port, max_buffer_size=1024 ** 3)
     logging.info("Application Started")
@@ -1053,6 +1060,8 @@ def main(print_func=None):
     parser.add_argument('-logging_level', metavar='logger_level', default='INFO',
                         help='logging level (default = INFO). Can take logging '
                              'level name or int (example: 20)')
+    parser.add_argument('-readonly', help='start in readonly mode', 
+                        action = 'store_true')
     FLAGS = parser.parse_args()
 
     try:
@@ -1067,7 +1076,7 @@ def main(print_func=None):
 
     logging.getLogger().setLevel(logging_level)
 
-    start_server(port=FLAGS.port, env_path=FLAGS.env_path, print_func=print_func)
+    start_server(port=FLAGS.port, env_path=FLAGS.env_path, readonly=FLAGS.readonly, print_func=print_func)
 
 
 if __name__ == "__main__":

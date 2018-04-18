@@ -36,7 +36,6 @@ import tornado.escape     # noqa E402: gotta install ioloop first
 LAYOUT_FILE = 'layouts.json'
 DEFAULT_ENV_PATH = '%s/.visdom/' % expanduser("~")
 DEFAULT_PORT = 8097
-READONLY = False
 READONLY_CMDS = ["close","delete_env","save_layouts"]
 
 def get_rand_id():
@@ -97,12 +96,13 @@ def serialize_all(state, env_path=DEFAULT_ENV_PATH):
 
 
 class Application(tornado.web.Application):
-    def __init__(self, port=DEFAULT_PORT, env_path=DEFAULT_ENV_PATH):
+    def __init__(self, port=DEFAULT_PORT, env_path=DEFAULT_ENV_PATH, readonly=False):
         self.state = {}
         self.subs = {}
         self.sources = {}
         self.env_path = env_path
         self.port = port
+        self.readonly = readonly
 
         # reload state
         ensure_dir_exists(env_path)
@@ -196,6 +196,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         self.subs = app.subs
         self.sources = app.sources
         self.broadcast_layouts()
+        self.readonly = app.readonly
 
     def check_origin(self, origin):
         return True
@@ -231,7 +232,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
             'Opened new socket from ip: {}'.format(self.request.remote_ip))
 
         self.write_message(
-                json.dumps({'command': 'register', 'data': self.sid , 'readonly': READONLY}))
+                json.dumps({'command': 'register', 'data': self.sid , 'readonly': self.readonly}))
         self.broadcast_layouts([self])
         broadcast_envs(self, [self])
 
@@ -240,7 +241,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         msg = tornado.escape.json_decode(tornado.escape.to_basestring(message))
 
         cmd = msg.get('cmd')
-        if READONLY and cmd in READONLY_CMDS:
+        if self.readonly and cmd in READONLY_CMDS:
             return
 
         if cmd == 'close':
@@ -1030,11 +1031,8 @@ def download_scripts(proxies=None, install_dir=None):
 
 
 def start_server(port=DEFAULT_PORT, env_path=DEFAULT_ENV_PATH, readonly=False, print_func=None):
-    global READONLY
     print("It's Alive!")
-    if readonly:
-        READONLY = True
-    app = Application(port=port, env_path=env_path)
+    app = Application(port=port, env_path=env_path, readonly=readonly)
     app.listen(port, max_buffer_size=1024 ** 3)
     logging.info("Application Started")
     if "HOSTNAME" in os.environ:

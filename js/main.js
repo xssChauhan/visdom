@@ -1089,10 +1089,12 @@ class App extends React.Component {
             <button
               className={classNames({
                 'btn': true,
-                'btn-success': this.state.connected,
-                'btn-danger': !this.state.connected})}
+                'btn-warning' : this.state.connected && this.state.readonly,
+                'btn-success': this.state.connected && !this.state.readonly,
+                'btn-danger': !this.state.connected
+                })}
               onClick={this.toggleOnlineState}>
-              'Shikhar'
+              {this.state.connected ? (this.state.readonly?'readonly':'online') : 'offline'}
             </button>
           </span>
         </div>

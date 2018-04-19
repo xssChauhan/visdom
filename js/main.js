@@ -80,7 +80,7 @@ if (ACTIVE_ENV !== '') {
 class App extends React.Component {
   state = {
     connected: false,
-    readonly:false,
+    readonly: false,
     sessionID: null,
     panes: {},
     focusedPaneID: null,
@@ -1089,12 +1089,12 @@ class App extends React.Component {
             <button
               className={classNames({
                 'btn': true,
-                'btn-warning' : this.state.connected && this.state.readonly,
+                'btn-warning': this.state.connected && this.state.readonly,
                 'btn-success': this.state.connected && !this.state.readonly,
                 'btn-danger': !this.state.connected
                 })}
               onClick={this.toggleOnlineState}>
-              {this.state.connected ? (this.state.readonly?'readonly':'online') : 'offline'}
+              {this.state.connected ? (this.state.readonly ? 'readonly' : 'online') : 'offline'}
             </button>
           </span>
         </div>

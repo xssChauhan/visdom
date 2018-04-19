@@ -36,7 +36,6 @@ import tornado.escape     # noqa E402: gotta install ioloop first
 LAYOUT_FILE = 'layouts.json'
 DEFAULT_ENV_PATH = '%s/.visdom/' % expanduser("~")
 DEFAULT_PORT = 8097
-READONLY_CMDS = ["close","delete_env","save_layouts"]
 
 def get_rand_id():
     return str(hex(int(time.time() * 10000000))[2:])
@@ -241,7 +240,8 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         msg = tornado.escape.json_decode(tornado.escape.to_basestring(message))
 
         cmd = msg.get('cmd')
-        if self.readonly and cmd in READONLY_CMDS:
+
+        if self.readonly:
             return
 
         if cmd == 'close':

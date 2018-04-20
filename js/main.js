@@ -295,7 +295,7 @@ class App extends React.Component {
 
   closePane = (paneID, keepPosition = false, setState = true) => {
     if (this.state.readonly) {
-      return
+      return;
     }
     let newPanes = Object.assign({}, this.state.panes);
     delete newPanes[paneID];
@@ -325,7 +325,7 @@ class App extends React.Component {
 
   closeAllPanes = () => {
     if(this.state.readonly){
-      return
+      return;
     }
     Object.keys(this.state.panes).map((paneID) => {
       this.closePane(paneID, false, false);

@@ -294,6 +294,9 @@ class App extends React.Component {
   }
 
   closePane = (paneID, keepPosition = false, setState = true) => {
+    if (this.state.readonly) {
+      return
+    }
     let newPanes = Object.assign({}, this.state.panes);
     delete newPanes[paneID];
     if (!keepPosition) {
@@ -321,6 +324,9 @@ class App extends React.Component {
   }
 
   closeAllPanes = () => {
+    if(this.state.readonly){
+      return
+    }
     Object.keys(this.state.panes).map((paneID) => {
       this.closePane(paneID, false, false);
     });
@@ -585,7 +591,7 @@ class App extends React.Component {
   }
 
   broadcastKeyEvent = (event) => {
-    if (this.state.focusedPaneID === null) {
+    if (this.state.focusedPaneID === null || this.state.readonly) {
       return;
     }
     let keyEvent = {
@@ -908,7 +914,7 @@ class App extends React.Component {
             title="Clear Current Environment"
             data-placement="bottom"
             className="btn btn-default"
-            disabled={!(this.state.connected && this.state.envID)}
+            disabled={!(this.state.connected && this.state.envID && !this.state.readonly)}
             onClick={this.closeAllPanes}>
             <span
               className="glyphicon glyphicon-erase">
@@ -919,7 +925,7 @@ class App extends React.Component {
             title="Manage Environments"
             data-placement="bottom"
             className="btn btn-default"
-            disabled={!(this.state.connected && this.state.envID)}
+            disabled={!(this.state.connected && this.state.envID && !this.state.readonly)}
             onClick={this.openEnvModal.bind(this)}>
             <span
               className="glyphicon glyphicon-folder-open">

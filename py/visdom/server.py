@@ -37,6 +37,7 @@ LAYOUT_FILE = 'layouts.json'
 DEFAULT_ENV_PATH = '%s/.visdom/' % expanduser("~")
 DEFAULT_PORT = 8097
 
+
 def get_rand_id():
     return str(hex(int(time.time() * 10000000))[2:])
 

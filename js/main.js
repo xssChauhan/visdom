@@ -324,7 +324,7 @@ class App extends React.Component {
   }
 
   closeAllPanes = () => {
-    if(this.state.readonly){
+    if (this.state.readonly) {
       return;
     }
     Object.keys(this.state.panes).map((paneID) => {

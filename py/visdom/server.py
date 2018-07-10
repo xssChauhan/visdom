@@ -156,6 +156,7 @@ class Application(tornado.web.Application):
             (r"/win_data", DataHandler, {'app': self}),
             (r"/delete_env", DeleteEnvHandler, {'app': self}),
             (r"/(.*)", IndexHandler, {'app': self}),
+            (r"/win_hash", HashHandler, {'app': self})
         ]
         super(Application, self).__init__(handlers, **tornado_settings)
 
@@ -663,6 +664,30 @@ class DeleteEnvHandler(BaseHandler):
             p = os.path.join(handler.env_path, "{0}.json".format(eid))
             os.remove(p)
             broadcast_envs(handler)
+
+    def post(self):
+        args = tornado.escape.json_decode(
+            tornado.escape.to_basestring(self.request.body)
+        )
+        self.wrap_func(self, args)
+
+class HashHandler(BaseHandler):
+    def initialize(self, app):
+        self.app = app
+        self.state = app.state
+
+    @staticmethod
+    def wrap_func(handler, args):
+        eid = extract_eid(args)
+
+        if args['win'] in handler.state[eid]['jsons']:
+            json_string = json.dumps(
+                handler.state[eid]['jsons']
+            ).encode("utf-8")
+            hashed = hashlib.md5(json_string)
+            handler.write(hashed)
+        else:
+            handler.write('false')
 
     def post(self):
         args = tornado.escape.json_decode(

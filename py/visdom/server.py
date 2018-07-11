@@ -155,8 +155,8 @@ class Application(tornado.web.Application):
             (r"/win_exists", ExistsHandler, {'app': self}),
             (r"/win_data", DataHandler, {'app': self}),
             (r"/delete_env", DeleteEnvHandler, {'app': self}),
-            (r"/(.*)", IndexHandler, {'app': self}),
-            (r"/win_hash", HashHandler, {'app': self})
+            (r"/win_hash", HashHandler, {'app': self}),
+            (r"/(.*)", IndexHandler, {'app': self})
         ]
         super(Application, self).__init__(handlers, **tornado_settings)
 
@@ -684,7 +684,7 @@ class HashHandler(BaseHandler):
             json_string = json.dumps(
                 handler.state[eid]['jsons']
             ).encode("utf-8")
-            hashed = hashlib.md5(json_string)
+            hashed = hashlib.md5(json_string).hexdigest()
             handler.write(hashed)
         else:
             handler.write('false')

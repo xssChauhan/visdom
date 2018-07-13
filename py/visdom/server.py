@@ -503,7 +503,7 @@ class ExistsHandler(BaseHandler):
     @staticmethod
     def wrap_func(handler, args):
         eid = extract_eid(args)
-
+        print(handler.state[eid]['jsons'])
         if args['win'] in handler.state[eid]['jsons']:
             handler.write('true')
         else:
@@ -513,6 +513,7 @@ class ExistsHandler(BaseHandler):
         args = tornado.escape.json_decode(
             tornado.escape.to_basestring(self.request.body)
         )
+        print(args)
         self.wrap_func(self, args)
 
 
@@ -679,10 +680,11 @@ class HashHandler(BaseHandler):
     @staticmethod
     def wrap_func(handler, args):
         eid = extract_eid(args)
-
-        if args['win'] in handler.state[eid]['jsons']:
+        handler_json = handler.state[eid]['jsons']
+        if args['win'] in handler_json:
+            window_json = handler_json[args['win']]
             json_string = json.dumps(
-                handler.state[eid]['jsons']
+                window_json
             ).encode("utf-8")
             hashed = hashlib.md5(json_string).hexdigest()
             handler.write(hashed)

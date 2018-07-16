@@ -684,7 +684,7 @@ class HashHandler(BaseHandler):
         if args['win'] in handler_json:
             window_json = handler_json[args['win']]
             json_string = json.dumps(
-                window_json
+                window_json, indent = 2
             ).encode("utf-8")
             hashed = hashlib.md5(json_string).hexdigest()
             handler.write(hashed)

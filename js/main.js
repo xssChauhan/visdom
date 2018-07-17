@@ -748,12 +748,28 @@ class App extends React.Component {
     this.setState({cols: cols, width: width}, () => {this.relayout()});
   }
 
-  generateWindowHash = (windowId) =>{
+  generateWindowHash = (windowId) => {
     let windowContent = this.state.panes[windowId];
 
     //Convert JSON data to string with a space of 2. This detail is important.
     let content_string = JSON.stringify(windowContent, null, 2);
     return md5(content_string)
+  }
+
+  getWindowHash = (windowId) => {
+    let url = "http://" + window.location.host + "/win_hash";
+
+    let body = {
+      "win" : windowId,
+      "env" : this.state.envID
+    }
+
+    return fetch(url, {
+      "method" : "POST",
+      "body" : JSON.stringify(body)
+    })
+    .then(res => res.text())
+
   }
 
   openEnvModal() {
@@ -1206,7 +1222,6 @@ class App extends React.Component {
         </div>
       </div>
     )
-    window.getHash = this.generateWindowHash;
   }
 }
 

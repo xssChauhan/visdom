@@ -764,12 +764,7 @@ class App extends React.Component {
       "env" : this.state.envID
     }
 
-    return fetch(url, {
-      "method" : "POST",
-      "body" : JSON.stringify(body)
-    })
-    .then(res => res.text())
-
+    return $.post(url, JSON.stringify(body))
   }
 
   openEnvModal() {
